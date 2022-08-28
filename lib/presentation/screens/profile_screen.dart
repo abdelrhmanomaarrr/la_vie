@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:la_vie/business_logic/la_vie_cubit/states.dart';
+import 'package:la_vie/constants/colors.dart';
 
 import '../../business_logic/la_vie_cubit/cubit.dart';
 
@@ -19,60 +20,60 @@ class _ProfileScreenState extends State<ProfileScreen> {
     var mediaQueryHeight = MediaQuery.of(context).size.height;
     var mediaQueryWidth = MediaQuery.of(context).size.width;
     return BlocConsumer<LaVieCubit, LaVieStates>(
-      listener: (context, state) {},
+        listener: (context, state) {},
       builder: (context, state) {
         return Column(
           children: [
             if(cubit.userModel != null)
-              Container(
-                width: mediaQueryWidth,
-                height: 250,
-                decoration: BoxDecoration(
-                  image: DecorationImage(
-                    fit: BoxFit.cover,
-                    colorFilter: ColorFilter.mode(
-                        Colors.black.withOpacity(0.8), BlendMode.darken),
-                    image: NetworkImage('https://res.cloudinary.com/lms07/image/upload/v1645954589/avatar/6214b94ad832b0549b436264_avatar1645954588291.png'),
-                  ),
-                ),
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children:  [
-                          CircleAvatar(
-                            backgroundImage: NetworkImage('https://res.cloudinary.com/lms07/image/upload/v1645954589/avatar/6214b94ad832b0549b436264_avatar1645954588291.png'),
-                            radius: 55,
-                          ),
-                          SizedBox(
-                            height: 12,
-                          ),
-                          Text(
-                            'Asir Abdelhady',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 20),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Positioned(
-                      top: 210,
-                      child: Container(
-                        width: mediaQueryWidth,
-                        height: mediaQueryHeight - 230,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20),
-                          color: Color(0xffF6F6F6),
-                        ),
-                      ),
-                    ),
-                  ],
+            Container(
+              width: mediaQueryWidth,
+              height: 250,
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  fit: BoxFit.cover,
+                  colorFilter: ColorFilter.mode(
+                      Colors.black.withOpacity(0.8), BlendMode.darken),
+                  image: NetworkImage('https://res.cloudinary.com/lms07/image/upload/v1645954589/avatar/6214b94ad832b0549b436264_avatar1645954588291.png'),
                 ),
               ),
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children:  [
+                        CircleAvatar(
+                         backgroundImage: NetworkImage('https://res.cloudinary.com/lms07/image/upload/v1645954589/avatar/6214b94ad832b0549b436264_avatar1645954588291.png'),
+                          radius: 55,
+                        ),
+                        SizedBox(
+                          height: 12,
+                        ),
+                        Text(
+                          'Asir Abdelhady',
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Positioned(
+                    top: 210,
+                    child: Container(
+                      width: mediaQueryWidth,
+                      height: mediaQueryHeight - 230,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        color: Color(0xffF6F6F6),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
             Padding(
               padding: const EdgeInsets.only(left: 25.0, right: 25),
               child: Column(
@@ -114,7 +115,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     height: 60,
                     decoration:
                     BoxDecoration(
-                        border: Border.all(color: Colors.grey),
+                        border: Border.all(color: lightGrey()),
                         borderRadius: BorderRadius.circular(5)),
                     child: Row(
                       children: [
@@ -149,7 +150,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     height: 60,
                     decoration:
                     BoxDecoration(
-                        border: Border.all(color: Colors.grey),
+                        border: Border.all(color: lightGrey()),
                         borderRadius: BorderRadius.circular(5)),
                     child: Row(
                       children: [

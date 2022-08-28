@@ -1,4 +1,3 @@
-import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:la_vie/business_logic/la_vie_cubit/cubit.dart';
@@ -15,7 +14,7 @@ void main() async{
   WidgetsFlutterBinding.ensureInitialized();
   Bloc.observer = MyBlocObserver();
   await CacheHelper.init();
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -24,6 +23,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var myToken = CacheHelper.getData(key: SharedKeys.token);
+
     return MultiBlocProvider(
       providers: [
         BlocProvider(
@@ -33,13 +33,13 @@ class MyApp extends StatelessWidget {
           create: (BuildContext context) => RegistrationCubit(),
         ),
         BlocProvider(
-          create: (BuildContext context) => LaVieCubit()..getSeeds()..getPlants()..getTools()..getProduct()..getCurrentUser(),
+          create: (BuildContext context) => LaVieCubit()..getSeeds()..getPlants()..getTools()..getProducts()..getForums()..getCurrentUser()..getMyForums(),
         ),
       ],
       child: MaterialApp(
         theme: greenTheme,
         debugShowCheckedModeBanner: false,
-        home: myToken != null ?  LayoutScreen() : LoginScreen(),
+        home: myToken != null ?  const LayoutScreen() : const LoginScreen(),
       ),
     );
   }

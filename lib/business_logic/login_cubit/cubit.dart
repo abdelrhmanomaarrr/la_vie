@@ -26,11 +26,12 @@ class LoginCubit extends Cubit<LoginStates>{
         data: {
           "email":email,
           "password":password,
-    },).then((value) {
+    },).then((value) async{
       print(value.data);
       loginModel = LoginModel.fromJson(value.data);
-      CacheHelper.saveData(key: SharedKeys.token, value: loginModel.data!.refreshToken);
-      print(loginModel.message.toString());
+      print('Refresh Token: ${loginModel.data!.refreshToken.toString()}');
+      await CacheHelper.saveData(key: SharedKeys.token, value: loginModel.data!.refreshToken.toString());
+      print('Refresh Token from shared Key: ${SharedKeys.token.toString()}');
       emit(LoginSuccessState(loginModel));
     }).catchError((error){
       if(error is DioError){

@@ -35,10 +35,10 @@ dependencies:
   shared_preferences: ^2.0.15
   curved_navigation_bar: ^1.0.3
   fluentui_system_icons: ^1.1.178
-  hexcolor: ^2.0.7
+  bubble_tab_indicator: ^0.1.6
   qr_code_scanner: ^1.0.1
-  image_picker: ^0.8.5+3
   cached_network_image: ^3.2.1
+  image_picker: ^0.8.5+3
   flutter:
     sdk: flutter
 

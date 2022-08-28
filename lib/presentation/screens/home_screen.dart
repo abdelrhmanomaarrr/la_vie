@@ -1,8 +1,18 @@
+import 'dart:convert';
+
+
+import 'package:conditional_builder_null_safety/conditional_builder_null_safety.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:hexcolor/hexcolor.dart';
-import 'package:la_vie/business_logic/la_vie_cubit/cubit.dart';
-import '../widgets/home_widgets.dart';
+import 'package:la_vie/business_logic/la_vie_cubit/states.dart';
+import 'package:la_vie/constants/colors.dart';
+import 'package:la_vie/constants/constants.dart';
+import 'package:la_vie/data/models/seeds_model.dart';
+import 'package:la_vie/presentation/widgets/widgets.dart';
+
+import '../../business_logic/la_vie_cubit/cubit.dart';
+
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
 
@@ -12,136 +22,196 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
 
-  int itemCounter = 1;
+
+
   @override
   Widget build(BuildContext context) {
     var cubit = BlocProvider.of<LaVieCubit>(context,listen: true);
-    return Column(
-      children: [
-        SizedBox(
-          height: 30,
+    var mediaQueryHeight = MediaQuery.of(context).size.height;
+    var mediaQueryWidth = MediaQuery.of(context).size.width;
+    ScrollController parentScrollController = ScrollController();
+    ScrollController childScrollController = ScrollController();
+    return BlocConsumer<LaVieCubit, LaVieStates>(
+      listener: (context, state) {
+      },
+    builder: (context, state) {
+      return SingleChildScrollView(
+        controller: parentScrollController,
+        physics: BouncingScrollPhysics(),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            laVieIcon(),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                searchFormFeild(width: 250),
+                shopingCartButton(),
+              ],
+            ),
+            SingleChildScrollView(
+                controller: childScrollController,
+                child: NotificationListener(
+                  onNotification: (ScrollNotification notification){
+                    if (notification is ScrollUpdateNotification) {
+                      if (notification.metrics.pixels ==
+                          notification.metrics.maxScrollExtent) {
+                        debugPrint('Reached the bottom');
+                        parentScrollController.animateTo(
+                            parentScrollController.position.maxScrollExtent,
+                            duration: Duration(milliseconds:300),
+                            curve: Curves.easeIn);
+                      } else if (notification.metrics.pixels ==
+                          notification.metrics.minScrollExtent) {
+                        debugPrint('Reached the top');
+                        parentScrollController.animateTo(
+                            parentScrollController.position.minScrollExtent,
+                            duration: Duration(milliseconds:300),
+                            curve: Curves.easeIn);
+                      }
+                    };
+                    return true;
+                  },
+                  child: DefaultTabController(
+                      initialIndex: 0,
+                      length: 5,
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 8.0, right: 8, top: 12),
+                        child: Column(
+                          children: [
+                            Container(
+                              width: mediaQueryWidth,
+                              height: 35,
+                              child: TabBar(
+                                tabs: [
+                                  Text('All'),
+                                  Text('Plants'),
+                                  Text('Seeds'),
+                                  Text('Tools'),
+                                  Text('Products'),
+                                ],
+                                unselectedLabelColor: Colors.grey,
+                                indicatorColor: Colors.white,
+                                labelColor: Colors.green,
+                                isScrollable: true,
+                                indicatorSize: TabBarIndicatorSize.tab,
+                                indicator: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    color: Colors.white,
+                                    border: Border.all(color: Colors.green)
+                                ),
+                              ),
+                            ),
+                            if(cubit.seedsModel!=null)
+                              Container(
+                                width: double.infinity,
+                                height: mediaQueryHeight,
+                                child: TabBarView(children: [
+                                  ConditionalBuilder(
+                                      condition: state is! DataLoadingState,
+                                      builder: (context) {
+                                        return GridView.builder(
+                                          gridDelegate:
+                                          SliverGridDelegateWithFixedCrossAxisCount(
+                                            crossAxisCount: 2,
+                                            childAspectRatio: 150/250,
+                                            crossAxisSpacing: 10,
+                                          ),
+                                          itemBuilder: (context, index) => defaultItemCard(
+                                            title: '${cubit.productsModel!.data![index].name}',
+                                            image: '${cubit.productsModel!.data![index].imageUrl}',
+                                            price: '${cubit.productsModel!.data![index].price}',
+                                          ),
+                                          itemCount: cubit.productsModel!.data!.length,
+                                        );
+                                      }, fallback: (context)=> CircularProgressIndicator()),
+                                  ConditionalBuilder(
+                                      condition: state is! DataLoadingState,
+                                      builder: (context) {
+                                        return GridView.builder(
+                                          gridDelegate:
+                                          SliverGridDelegateWithFixedCrossAxisCount(
+                                            crossAxisCount: 2,
+                                            childAspectRatio: 150/250,
+                                            crossAxisSpacing: 10,
+                                          ),
+                                          itemBuilder: (context, index) => defaultItemCard(
+                                            title: '${cubit.plantsModel!.data![index].name}',
+                                            image: '${cubit.plantsModel!.data![index].imageUrl}',
+                                            price: '50 EGP',
+                                          ),
+                                          itemCount: cubit.plantsModel!.data!.length,
+                                        );
+                                      }, fallback: (context)=> CircularProgressIndicator()),
+                                  ConditionalBuilder(
+                                      condition: state is! DataLoadingState,
+                                      builder: (context) {
+                                        return GridView.builder(
+                                          gridDelegate:
+                                          SliverGridDelegateWithFixedCrossAxisCount(
+                                            crossAxisCount: 2,
+                                            childAspectRatio: 150/250,
+                                            crossAxisSpacing: 10,
+                                          ),
+                                          itemBuilder: (context, index) => defaultItemCard(
+                                            title: '${cubit.seedsModel!.data![index].name}',
+                                            image: '${cubit.seedsModel!.data![index].imageUrl}',
+                                            price: '50 EGP',
+                                          ),
+                                          itemCount: cubit.seedsModel!.data!.length,
+                                        );
+                                      }, fallback: (context)=> CircularProgressIndicator()),
+                                  ConditionalBuilder(
+                                      condition: state is! DataLoadingState,
+                                      builder: (context) {
+                                        return GridView.builder(
+                                          gridDelegate:
+                                          SliverGridDelegateWithFixedCrossAxisCount(
+                                            crossAxisCount: 2,
+                                            childAspectRatio: 150/250,
+                                            crossAxisSpacing: 10,
+                                          ),
+                                          itemBuilder: (context, index) => defaultItemCard(
+                                            title: '${cubit.toolsModels!.data![index].name}',
+                                            image: '${cubit.toolsModels!.data![index].imageUrl}',
+                                            price: '50 EGP',
+                                          ),
+                                          itemCount: cubit.toolsModels!.data!.length,
+                                        );
+                                      }, fallback: (context)=> CircularProgressIndicator()),
+                                  ConditionalBuilder(
+                                      condition: state is! DataLoadingState,
+                                      builder: (context) {
+                                        return GridView.builder(
+                                          gridDelegate:
+                                          SliverGridDelegateWithFixedCrossAxisCount(
+                                            crossAxisCount: 2,
+                                            childAspectRatio: 150/250,
+                                            crossAxisSpacing: 10,
+                                          ),
+                                          itemBuilder: (context, index) => defaultItemCard(
+                                            title: '${cubit.productsModel!.data![index].name}',
+                                            image: '${cubit.productsModel!.data![index].imageUrl}',
+                                            price: '${cubit.productsModel!.data![index].price}',
+                                          ),
+                                          itemCount: cubit.productsModel!.data!.length,
+                                        );
+                                      }, fallback: (context)=> CircularProgressIndicator()),
+                                ]),
+                              ),
+                          ],
+                        ),
+                      )),
+                )
+            ),
+          ],
         ),
-        Center(
-            child: Image(image: AssetImage('assets/images/La Vie Logo.png'))),
-        SizedBox(
-          height: 20,
-        ),
-        Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: Row(
-            children: [
-              Container(
-                height: 46,
-                width: 300,
-                child: TextFormField(
-                  decoration: InputDecoration(
-                    hintText: 'Search',
-                    prefixIcon: Icon(Icons.search),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(width: 10,),
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.green,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: IconButton(
-                  onPressed: () {},
-                  icon: Icon(
-                    Icons.add_shopping_cart,
-                    color: HexColor('#F8F8F8'),
-                  ),
-                ),
-              )
-            ],
-          ),
-        ),
-        SizedBox(
-          height: 10,
-        ),
-        DefaultTabController(
-            length: 5,
-            initialIndex: 0,
-            child: Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: Column(
-                children: [
-                  Container(
-                    width: MediaQuery.of(context).size.height,
-                    height: 40,
-                    child: TabBar(tabs: [
-                      Text('All'),
-                      Text('Plants'),
-                      Text('Seeds'),
-                      Text('Tools'),
-                      Text('Products'),],
-                      unselectedLabelColor: Colors.grey,
-                      indicatorColor: Colors.white,
-                      labelColor: Colors.green,
-                      isScrollable: true,
-                      indicatorSize: TabBarIndicatorSize.tab,
-                      indicator: BoxDecoration(
-                          borderRadius: BorderRadius.circular(5),
-                          color: Colors.white,
-                          border: Border.all(color: Colors.green)
-                      ),
-                    ),
-                  ),
-                  if(cubit.seedsModel!=null)
-                  Container(
-                    height: MediaQuery.of(context).size.height-299,
-                    width: double.infinity,
-                    child: TabBarView(children: [
-                      Center(child: Text('hi') ),
-                      GridView.builder(
-                          gridDelegate:  SliverGridDelegateWithMaxCrossAxisExtent(
-                            maxCrossAxisExtent: 200,
-                            childAspectRatio: 150 / 270,
-                          ),
-                          itemCount:cubit.plantsModel!.data!.length,
-                          itemBuilder: (BuildContext ctx, index) {
-                            return IthemCard(title: cubit.plantsModel!.data![index].name,image:cubit.plantsModel!.data![index].imageUrl ,price: 0,);
-                          }),
-                      GridView.builder(
-                          gridDelegate:  SliverGridDelegateWithMaxCrossAxisExtent(
-                            maxCrossAxisExtent: 200,
-                            childAspectRatio: 150 / 270,
-                          ),
-                          itemCount:cubit.seedsModel!.data!.length,
-                          itemBuilder: (BuildContext ctx, index) {
-                            return IthemCard(title: cubit.seedsModel!.data![index].name,image:cubit.seedsModel!.data![index].imageUrl ,price: 0,);
-                          }),
-                      GridView.builder(
-                          gridDelegate:  SliverGridDelegateWithMaxCrossAxisExtent(
-                            maxCrossAxisExtent: 200,
-                            childAspectRatio: 150 / 270,
-                          ),
-                          itemCount:cubit.toolsModel!.data!.length,
-                          itemBuilder: (BuildContext ctx, index) {
-                            return IthemCard(title: cubit.toolsModel!.data![index].name,image:cubit.toolsModel!.data![index].imageUrl ,price: 0,);
-                          }),
-                      GridView.builder(
-                          gridDelegate:  SliverGridDelegateWithMaxCrossAxisExtent(
-                            maxCrossAxisExtent: 200,
-                            childAspectRatio: 150 / 270,
-                          ),
-                          itemCount:cubit.productModel!.data!.length,
-                          itemBuilder: (BuildContext ctx, index) {
-                            return IthemCard(title: cubit.productModel!.data![index].name,image:cubit.productModel!.data![index].imageUrl ,price: cubit.productModel!.data![index].price,);
-                          }),
-                    ]),
-                  ),
-                ],
-              ),
-
-            )
-        ),
-
-      ],
+      );
+    },
     );
   }
 }
+
+
+
+
